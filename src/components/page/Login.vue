@@ -30,6 +30,8 @@
 <script>
 import axios from 'axios'
 import qs from 'qs'
+import global from '../common/Global'
+
 export default {
     
     data: function() {
@@ -49,14 +51,18 @@ export default {
         submitForm() {
             let data = this.param
             let router = this.$router
-
-            axios.post("http://ec2-54-148-49-213.us-west-2.compute.amazonaws.com:8080/login",qs.stringify(this.param))
+            let message = this.$message;
+            console.log(global.serverAddress)
+            axios.post(global.serverAddress + "/login",qs.stringify(this.param))
             .then(function(value){
                 if(value.data.result){
                     localStorage.setItem('ms_username', data.name);
                     localStorage.setItem('token', value.data.data);
                     console.log(localStorage.getItem('token'))
                     router.push('/');
+                }
+                else{
+                    message.error("用户名或密码错误!")
                 }
             })
             
