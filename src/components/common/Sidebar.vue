@@ -19,7 +19,7 @@
                         </template>
                         <template v-for="subItem in item.children">
                             <el-submenu
-                                v-if="subItem.children"
+                                v-if="subItem.children.length > 0"
                                 :index="subItem.index"
                                 :key="subItem.index"
                             >
@@ -58,7 +58,7 @@ export  default {
     data() {
         return {
             collapse: false,
-            items: [
+            items: null
                 // {
                 //     icon: 'el-icon-lx-home',
                 //     index: 'dashboard',
@@ -153,7 +153,7 @@ export  default {
                 //     index: '/donate',
                 //     title: '支持作者'
                 // }
-            ]
+            
 
         };
     },
@@ -183,36 +183,36 @@ export  default {
                 }
             }).then((value)=>{
 
-                this.menu = value.data;
+                this.items = value.data;
                 
             });
             console.log(this.menu)
 
-            this.items.push({
-                    icon: this.menu[0].icon,
-                    index: "dashboard",
-                    title: this.menu[0].title
-                },
-                {
-                    icon: this.menu[1].icon,
-                    index: this.menu[1].index,
-                    title: this.menu[1].title,
-                    children: [
-                        {
-                            icon: this.menu[1].children[0].icon,
-                            index: this.menu[1].children[0].index,
-                            title: this.menu[1].children[0].title,
-                            children: [
-                                {
-                                    icon: this.menu[1].children[0].children[0].icon,
-                                    index: this.menu[1].children[0].children[0].index,
-                                    title: this.menu[1].children[0].children[0].title,
-                                }
-                             ]
-                        }
-                    ]
-                },
-                )
+            // this.items.push({
+            //         icon: this.menu[0].icon,
+            //         index: "dashboard",
+            //         title: this.menu[0].title
+            //     },
+            //     {
+            //         icon: this.menu[1].icon,
+            //         index: this.menu[1].index,
+            //         title: this.menu[1].title,
+            //         children: [
+            //             {
+            //                 icon: this.menu[1].children[0].icon,
+            //                 index: this.menu[1].children[0].index,
+            //                 title: this.menu[1].children[0].title,
+            //                 children: [
+            //                     {
+            //                         icon: this.menu[1].children[0].children[0].icon,
+            //                         index: this.menu[1].children[0].children[0].index,
+            //                         title: this.menu[1].children[0].children[0].title,
+            //                     }
+            //                  ]
+            //             }
+            //         ]
+            //     },
+            //     )
             
             
         }
