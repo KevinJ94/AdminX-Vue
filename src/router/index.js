@@ -3,6 +3,11 @@ import Router from 'vue-router';
 
 Vue.use(Router);
 
+const originalPush = Router.prototype.push;
+Router.prototype.push = function push(location) {
+  return originalPush.call(this, location).catch(err => err)
+};
+
 export default new Router({
     routes: [
         {
@@ -17,7 +22,7 @@ export default new Router({
                 {
                     path: '/dashboard',
                     component: () => import(/* webpackChunkName: "dashboard" */ '../components/page/Dashboard.vue'),
-                    meta: { title: '系统首页' }
+                    meta: { title: '系统首页' },
                 },
                 {
                     path: '/icon',

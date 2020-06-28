@@ -11,21 +11,21 @@
             router
         >
             <template v-for="item in items">
-                <template v-if="item.subs">
+                <template v-if="item.children">
                     <el-submenu :index="item.index" :key="item.index">
                         <template slot="title">
                             <i :class="item.icon"></i>
                             <span slot="title">{{ item.title }}</span>
                         </template>
-                        <template v-for="subItem in item.subs">
+                        <template v-for="subItem in item.children">
                             <el-submenu
-                                v-if="subItem.subs"
+                                v-if="subItem.children"
                                 :index="subItem.index"
                                 :key="subItem.index"
                             >
                                 <template slot="title">{{ subItem.title }}</template>
                                 <el-menu-item
-                                    v-for="(threeItem,i) in subItem.subs"
+                                    v-for="(threeItem,i) in subItem.children"
                                     :key="i"
                                     :index="threeItem.index"
                                 >{{ threeItem.title }}</el-menu-item>
@@ -50,107 +50,111 @@
 </template>
 
 <script>
+import axios from 'axios'
 import bus from '../common/bus';
-export default {
+import global from '../common/Global'
+let menu = [];
+export  default {
     data() {
         return {
             collapse: false,
             items: [
-                {
-                    icon: 'el-icon-lx-home',
-                    index: 'dashboard',
-                    title: '系统首页'
-                },
-                {
-                    icon: 'el-icon-lx-cascades',
-                    index: 'table',
-                    title: '基础表格'
-                },
-                {
-                    icon: 'el-icon-lx-copy',
-                    index: 'tabs',
-                    title: 'tab选项卡'
-                },
-                {
-                    icon: 'el-icon-lx-calendar',
-                    index: '3',
-                    title: '表单相关',
-                    subs: [
-                        {
-                            index: 'form',
-                            title: '基本表单'
-                        },
-                        {
-                            index: '3-2',
-                            title: '三级菜单',
-                            subs: [
-                                {
-                                    index: 'editor',
-                                    title: '富文本编辑器'
-                                },
-                                {
-                                    index: 'markdown',
-                                    title: 'markdown编辑器'
-                                }
-                            ]
-                        },
-                        {
-                            index: 'upload',
-                            title: '文件上传'
-                        }
-                    ]
-                },
-                {
-                    icon: 'el-icon-lx-emoji',
-                    index: 'icon',
-                    title: '自定义图标'
-                },
-                {
-                    icon: 'el-icon-pie-chart',
-                    index: 'charts',
-                    title: 'schart图表'
-                },
-                {
-                    icon: 'el-icon-rank',
-                    index: '6',
-                    title: '拖拽组件',
-                    subs: [
-                        {
-                            index: 'drag',
-                            title: '拖拽列表'
-                        },
-                        {
-                            index: 'dialog',
-                            title: '拖拽弹框'
-                        }
-                    ]
-                },
-                {
-                    icon: 'el-icon-lx-global',
-                    index: 'i18n',
-                    title: '国际化功能'
-                },
-                {
-                    icon: 'el-icon-lx-warn',
-                    index: '7',
-                    title: '错误处理',
-                    subs: [
-                        {
-                            index: 'permission',
-                            title: '权限测试'
-                        },
-                        {
-                            index: '404',
-                            title: '404页面'
-                        }
-                    ]
-                },
-                {
-                    icon: 'el-icon-lx-redpacket_fill',
-                    index: '/donate',
-                    title: '支持作者'
-                }
+                // {
+                //     icon: 'el-icon-lx-home',
+                //     index: 'dashboard',
+                //     title: '系统首页'
+                // },
+                // {
+                //     icon: 'el-icon-lx-cascades',
+                //     index: 'table',
+                //     title: '基础表格'
+                // },
+                // {
+                //     icon: 'el-icon-lx-copy',
+                //     index: 'tabs',
+                //     title: 'tab选项卡'
+                // },
+                // {
+                //     icon: 'el-icon-lx-calendar',
+                //     index: '3',
+                //     title: '表单相关',
+                //     children: [
+                //         {
+                //             index: 'form',
+                //             title: '基本表单'
+                //         },
+                //         {
+                //             index: '3-2',
+                //             title: '三级菜单',
+                //             children: [
+                //                 {
+                //                     index: 'editor',
+                //                     title: '富文本编辑器'
+                //                 },
+                //                 {
+                //                     index: 'markdown',
+                //                     title: 'markdown编辑器'
+                //                 }
+                //             ]
+                //         },
+                //         {
+                //             index: 'upload',
+                //             title: '文件上传'
+                //         }
+                //     ]
+                // },
+                // {
+                //     icon: 'el-icon-lx-emoji',
+                //     index: 'icon',
+                //     title: '自定义图标'
+                // },
+                // {
+                //     icon: 'el-icon-pie-chart',
+                //     index: 'charts',
+                //     title: 'schart图表'
+                // },
+                // {
+                //     icon: 'el-icon-rank',
+                //     index: '6',
+                //     title: '拖拽组件',
+                //     children: [
+                //         {
+                //             index: 'drag',
+                //             title: '拖拽列表'
+                //         },
+                //         {
+                //             index: 'dialog',
+                //             title: '拖拽弹框'
+                //         }
+                //     ]
+                // },
+                // {
+                //     icon: 'el-icon-lx-global',
+                //     index: 'i18n',
+                //     title: '国际化功能'
+                // },
+                // {
+                //     icon: 'el-icon-lx-warn',
+                //     index: '7',
+                //     title: '错误处理',
+                //     children: [
+                //         {
+                //             index: 'permission',
+                //             title: '权限测试'
+                //         },
+                //         {
+                //             index: '404',
+                //             title: '404页面'
+                //         }
+                //     ]
+                // },
+                // {
+                //     icon: 'el-icon-lx-redpacket_fill',
+                //     index: '/donate',
+                //     title: '支持作者'
+                // }
             ]
+
         };
     },
     computed: {
@@ -159,11 +163,59 @@ export default {
         }
     },
     created() {
+        this.getmenu();
         // 通过 Event Bus 进行组件间通信，来折叠侧边栏
         bus.$on('collapse', msg => {
             this.collapse = msg;
             bus.$emit('collapse-content', msg);
         });
+    },
+    
+    methods:{
+        
+        async getmenu(){
+            // var _this = this;
+            
+            await axios.get(global.serverAddress + "/getmenu/" + localStorage.getItem('ms_username'),{
+            // axios.get(global.serverAddress + "/getmenu/zhang3",{
+                headers:{
+                    authorization:localStorage.getItem('token')
+                }
+            }).then((value)=>{
+
+                this.menu = value.data;
+                
+            });
+            console.log(this.menu)
+
+            this.items.push({
+                    icon: this.menu[0].icon,
+                    index: "dashboard",
+                    title: this.menu[0].title
+                },
+                {
+                    icon: this.menu[1].icon,
+                    index: this.menu[1].index,
+                    title: this.menu[1].title,
+                    children: [
+                        {
+                            icon: this.menu[1].children[0].icon,
+                            index: this.menu[1].children[0].index,
+                            title: this.menu[1].children[0].title,
+                            children: [
+                                {
+                                    icon: this.menu[1].children[0].children[0].icon,
+                                    index: this.menu[1].children[0].children[0].index,
+                                    title: this.menu[1].children[0].children[0].title,
+                                }
+                             ]
+                        }
+                    ]
+                },
+                )
+            
+            
+        }
     }
 };
 </script>
