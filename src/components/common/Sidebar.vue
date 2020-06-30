@@ -186,7 +186,7 @@ export  default {
                 this.items = value.data;
                 
             });
-            console.log(this.menu)
+
 
             // this.items.push({
             //         icon: this.menu[0].icon,
