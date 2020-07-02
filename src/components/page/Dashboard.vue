@@ -226,10 +226,12 @@ export default {
             return this.name === 'admin' ? '超级管理员' : '普通用户';
         }
     },
-    // created() {
-    //     this.handleListener();
-    //     this.changeDate();
-    // },
+    created() {
+        
+
+        // this.handleListener();
+        // this.changeDate();
+    },
     // activated() {
     //     this.handleListener();
     // },

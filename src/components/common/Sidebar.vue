@@ -173,10 +173,10 @@ export  default {
     
     methods:{
         
-        async getmenu(){
+        getmenu(){
             // var _this = this;
             
-            await axios.get(global.serverAddress + "/getmenu/" + localStorage.getItem('ms_username'),{
+            axios.get(global.serverAddress + "/getmenu/" + localStorage.getItem('ms_username'),{
             // axios.get(global.serverAddress + "/getmenu/zhang3",{
                 headers:{
                     authorization:localStorage.getItem('token')
@@ -187,32 +187,6 @@ export  default {
                 
             });
 
-
-            // this.items.push({
-            //         icon: this.menu[0].icon,
-            //         index: "dashboard",
-            //         title: this.menu[0].title
-            //     },
-            //     {
-            //         icon: this.menu[1].icon,
-            //         index: this.menu[1].index,
-            //         title: this.menu[1].title,
-            //         children: [
-            //             {
-            //                 icon: this.menu[1].children[0].icon,
-            //                 index: this.menu[1].children[0].index,
-            //                 title: this.menu[1].children[0].title,
-            //                 children: [
-            //                     {
-            //                         icon: this.menu[1].children[0].children[0].icon,
-            //                         index: this.menu[1].children[0].children[0].index,
-            //                         title: this.menu[1].children[0].children[0].title,
-            //                     }
-            //                  ]
-            //             }
-            //         ]
-            //     },
-            //     )
             
             
         }
