@@ -182,8 +182,14 @@ export  default {
                     authorization:localStorage.getItem('token')
                 }
             }).then((value)=>{
-
-                this.items = value.data;
+                console.log(value.data.result)
+                if(value.data.result){
+                    this.items = value.data.data;
+                }else{
+                    localStorage.removeItem('ms_username');
+                    this.$router.push('/login')
+                }
+                
                 
             });
 

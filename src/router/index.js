@@ -94,9 +94,9 @@ export let routerData = [
         meta: { title: '403' }
     },
     {
-        path: '/donate',
-        component: (resolve) => require(/* webpackChunkName: "donate" */ ['../components/page/Donate.vue'],resolve),
-        meta: { title: '支持作者' }
+        path: '/user',
+        component: (resolve) => require(/* webpackChunkName: "user" */ ['../components/page/User.vue'],resolve),
+        meta: { title: '用户管理' }
     }
 ];
 
