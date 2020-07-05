@@ -10,8 +10,9 @@
                     </el-breadcrumb>
                 </div>
                 <div class="container">
-                    <div class="handle-box">
+                    <div class="handle-box" style="padding-bottom: 10px">
                         <el-button
+                            style="padding-right: 10px"
                             type="primary"
                             icon="el-icon-delete"
                             class="handle-del mr10"
@@ -25,9 +26,9 @@
                             <el-option key="1" label="广东省" value="广东省"></el-option>
                             <el-option key="2" label="湖南省" value="湖南省"></el-option>
                         </el-select>
-                        
+
                         <!-- <el-input v-model="query.name" placeholder="用户名" class="handle-input mr10"></el-input>
-                        <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button> -->
+                        <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>-->
                     </div>
                     <el-table
                         :data="tableData"
@@ -52,9 +53,8 @@
                                 ></el-image>
                             </template>
                         </el-table-column>
-                        <el-table-column prop="address" label="地址"></el-table-column> -->
+                        <el-table-column prop="address" label="地址"></el-table-column>-->
                         <el-table-column prop="enable" label="状态" align="center">
-                            
                             <template slot-scope="scope">
                                 <el-tag
                                     :type="scope.row.enable===1?'success':(scope.row.enable=== 0 ?'danger':'')"
@@ -99,9 +99,12 @@
                         </el-form-item>
                         <!-- <el-form-item label="状态">
                             <el-input v-model="form.enable"></el-input>
-                        </el-form-item> -->
+                        </el-form-item>-->
                         <el-form-item label="状态">
-                            <el-radio v-model="form.enable" >备选项</el-radio>
+                            <el-radio-group v-model="radio">
+                                <el-radio :label="1">启用</el-radio>
+                                <el-radio :label="0">禁用</el-radio>
+                            </el-radio-group>
                         </el-form-item>
                     </el-form>
                     <span slot="footer" class="dialog-footer">
@@ -118,7 +121,7 @@
 
 <script>
 import { fetchData } from '../../api/index';
-import global from '../common/Global'
+import global from '../common/Global';
 import axios from 'axios';
 export default {
     name: 'basetable',
@@ -137,7 +140,8 @@ export default {
             pageTotal: 0,
             form: {},
             idx: -1,
-            id: -1
+            id: -1,
+            radio: null
         };
     },
     created() {
@@ -154,16 +158,17 @@ export default {
             });
         },
         getMyData() {
-            axios.get(global.serverAddress + "/user",{
-                headers:{
-                    authorization:localStorage.getItem('token')
-                }
-            }).then((value)=>{
-                console.log(value.data.data);
-                this.tableData = value.data.data;
-            });
-        }
-        ,
+            axios
+                .get(global.serverAddress + '/user', {
+                    headers: {
+                        authorization: localStorage.getItem('token')
+                    }
+                })
+                .then(value => {
+                    console.log(value.data.data);
+                    this.tableData = value.data.data;
+                });
+        },
         // 触发搜索按钮
         handleSearch() {
             this.$set(this.query, 'pageIndex', 1);
@@ -200,12 +205,15 @@ export default {
             this.idx = index;
             this.form = row;
             this.editVisible = true;
+            this.radio = row.enable;
+            console.log(this.radio)
         },
         // 保存编辑
         saveEdit() {
             this.editVisible = false;
             this.$message.success(`修改第 ${this.idx + 1} 行成功`);
             this.$set(this.tableData, this.idx, this.form);
+            console.log('保存', this.radio)
         },
         // 分页导航
         handlePageChange(val) {
