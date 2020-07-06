@@ -11,7 +11,7 @@
                 </div>
                 <div class="container">
                     <div class="handle-box" style="padding-bottom: 10px">
-                        <el-button
+                        <!-- <el-button
                             style="padding-right: 10px"
                             type="primary"
                             icon="el-icon-delete"
@@ -25,10 +25,10 @@
                         >
                             <el-option key="1" label="广东省" value="广东省"></el-option>
                             <el-option key="2" label="湖南省" value="湖南省"></el-option>
-                        </el-select>
+                        </el-select> -->
 
-                        <!-- <el-input v-model="query.name" placeholder="用户名" class="handle-input mr10"></el-input>
-                        <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>-->
+                        <!-- <el-input v-model="query.name" placeholder="用户名" class="handle-input mr10"></el-input> -->
+                        <el-button type="primary" icon="el-icon-lx-add" @click="handleAdd">新增用户</el-button>
                     </div>
                     <el-table
                         :data="tableData"
@@ -112,6 +112,30 @@
                         <el-button type="primary" @click="saveEdit">确 定</el-button>
                     </span>
                 </el-dialog>
+
+                <el-dialog title="新增用户" :visible.sync="addVisible" width="30%">
+                    <el-form ref="form" :model="form" label-width="70px">
+                        <el-form-item label="用户名">
+                            <el-input v-model="addForm.name"></el-input>
+                        </el-form-item>
+                        <el-form-item label="密码">
+                            <el-input type="password" v-model="addForm.password"></el-input>
+                        </el-form-item>
+                         <el-form-item label="确认密码">
+                            <el-input type="password" v-model="addForm.confirmPass"></el-input>
+                        </el-form-item>
+                        <el-form-item label="状态">
+                            <el-radio-group v-model="addForm.enable">
+                                <el-radio :label="1">启用</el-radio>
+                                <el-radio :label="0">禁用</el-radio>
+                            </el-radio-group>
+                        </el-form-item>
+                    </el-form>
+                    <span slot="footer" class="dialog-footer">
+                        <el-button @click="addVisible = false">取 消</el-button>
+                        <el-button type="primary" @click="saveAdd">确 定</el-button>
+                    </span>
+                </el-dialog>
             </div>
         </template>
     </div>
@@ -123,6 +147,7 @@
 import { fetchData } from '../../api/index';
 import global from '../common/Global';
 import axios from 'axios';
+import qs from 'qs';
 export default {
     name: 'basetable',
     data() {
@@ -137,8 +162,10 @@ export default {
             multipleSelection: [],
             delList: [],
             editVisible: false,
+            addVisible: false,
             pageTotal: 0,
-            form: {},
+            form: {name:null,password:null,enable:null,confirmPass:null},
+            addForm:{},
             idx: -1,
             id: -1,
             radio: null
@@ -207,6 +234,39 @@ export default {
             this.editVisible = true;
             this.radio = row.enable;
             console.log(this.radio)
+        },
+        handleAdd() {
+            this.addVisible = true;
+        },
+         saveAdd() {
+            if(this.addForm.password != this.addForm.confirmPass){
+                this.$message.error('输入的密码不一致')
+                return
+            }
+            else{
+                
+                axios
+                .post(global.serverAddress + '/user',qs.stringify(this.addForm), {
+                    headers: {
+                        authorization: localStorage.getItem('token')
+                    }
+                })
+                .then(value => {
+                    if(value.data.result){
+                        this.addVisible = false
+                        this.$message.success(value.data.msg)
+
+                    }else{
+                        this.$message.error(value.data.msg)
+                    }
+                    this.addForm.enable = null
+                    this.addForm.name = null
+                    this.addForm.password = null
+                    this.addForm.confirmPass = null
+                    location.reload()
+                });
+            }
+            
         },
         // 保存编辑
         saveEdit() {

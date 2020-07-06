@@ -31,10 +31,8 @@ router.beforeEach((to, from, next) => {
 
     if (to.path == '/login' && role) {
         next('/');
-    } else if (to.meta.permission) {
-        // 如果是管理员权限则可进入，这里只是简单的模拟管理员权限而已
-        role === 'admin' || 'zhang3' ? next() : next('/403');
-    } else {
+    } 
+    else {
         console.log('here')
         // if(localStorage.getItem('routers')){
         //     console.log(JSON.parse(localStorage.getItem('routers')))
