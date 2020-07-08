@@ -74,7 +74,7 @@ export let routerData = [
     {
         // 国际化组件
         path: '/i18n',
-        component: (resolve) => require(/* webpackChunkName: "i18n" */ ['../components/page/I18n.vue'],resolve),
+        component: (resolve) => require(/* webpackChunkName: "i18n" */ ['../components/page/Role.vue'],resolve),
         meta: { title: '国际化' }
     },
     {
