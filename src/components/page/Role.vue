@@ -2,7 +2,7 @@
     <div class="custom-tree-container">
         <div class="block">
             <p style="padding-bottom: 10px">角色管理</p>
-            <el-button type="primary" @click="() => handleAdd()" >新增角色</el-button>
+            <el-button type="primary" @click="() => handleAdd()" style="margin-bottom: 10px">新增角色</el-button>
             <el-tree
                 :data="data"
                 :props="defaultProps"
@@ -27,7 +27,7 @@
             <el-dialog title="增加角色" :visible.sync="addVisible" width="30%">
                 <el-form ref="form" :model="form" label-width="70px">
                     <el-form-item label="父角色:">
-                        <el-input v-model="form.prole" :disabled="true"></el-input>
+                        <el-input v-model="form.desc_" :disabled="true"></el-input>
                     </el-form-item>
                     <el-form-item label="新角色:">
                         <el-input v-model="form.role"></el-input>
@@ -44,7 +44,7 @@
             <el-dialog title="修改角色" :visible.sync="editVisible" width="30%">
                 <el-form ref="form" :model="form" label-width="70px">
                     <el-form-item label="父角色:">
-                        <el-input v-model="form.prole" :disabled="true"></el-input>
+                        <el-input v-model="form.desc_" :disabled="true"></el-input>
                     </el-form-item>
                     <el-form-item label="新角色:">
                         <el-input v-model="form.role"></el-input>
@@ -118,10 +118,8 @@ export default {
             this.addVisible = true;
 
             if (data == null) {
-                this.form.pid = "null";
                 this.form.desc_ = "无";
             } else {
-                this.form.pid = data.id;
                 this.form.desc_ = data.desc_;
             }
             // console.log(data.desc_)
@@ -130,7 +128,7 @@ export default {
         handleEdit(data) {
             this.editVisible = true;
             let pid = data.id;
-            this.form.prole = data.desc_;
+            this.form.desc_ = data.desc_;
             // console.log(pid)
         },
 
