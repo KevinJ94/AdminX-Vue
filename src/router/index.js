@@ -73,9 +73,9 @@ export let routerData = [
     },
     {
         // 国际化组件
-        path: '/i18n',
+        path: '/role',
         component: (resolve) => require(/* webpackChunkName: "i18n" */ ['../components/page/Role.vue'],resolve),
-        meta: { title: '国际化' }
+        meta: { title: '角色管理' }
     },
     {
         // 权限页面
