@@ -70,12 +70,12 @@
                                     icon="el-icon-edit"
                                     @click="handleEdit(scope.$index, scope.row)"
                                 >编辑</el-button>
-                                <el-button
+                                <!-- <el-button
                                     type="text"
                                     icon="el-icon-delete"
                                     class="red"
                                     @click="handleDelete(scope.$index, scope.row)"
-                                >删除</el-button>
+                                >删除</el-button> -->
                             </template>
                         </el-table-column>
                     </el-table>
@@ -95,7 +95,8 @@
                 <el-dialog title="编辑" :visible.sync="editVisible" width="30%">
                     <el-form ref="form" :model="form" label-width="70px">
                         <el-form-item label="用户名">
-                            <el-input v-model="form.name"></el-input>
+                            <el-input v-model="form.name" 
+                            :disabled="true"></el-input>
                         </el-form-item>
                         <!-- <el-form-item label="状态">
                             <el-input v-model="form.enable"></el-input>
@@ -164,7 +165,7 @@ export default {
             editVisible: false,
             addVisible: false,
             pageTotal: 0,
-            form: {name:null,password:null,enable:null,confirmPass:null},
+            form: {},
             addForm:{},
             idx: -1,
             id: -1,
@@ -233,7 +234,9 @@ export default {
             this.form = row;
             this.editVisible = true;
             this.radio = row.enable;
-            console.log(this.radio)
+            this.addForm.id = row.id;
+            this.addForm.enable = row.enable;
+            
         },
         handleAdd() {
             this.addVisible = true;
@@ -259,10 +262,7 @@ export default {
                     }else{
                         this.$message.error(value.data.msg)
                     }
-                    this.addForm.enable = null
-                    this.addForm.name = null
-                    this.addForm.password = null
-                    this.addForm.confirmPass = null
+                    this.addForm = {}
                     location.reload()
                 });
             }
@@ -270,10 +270,27 @@ export default {
         },
         // 保存编辑
         saveEdit() {
+            this.addForm.enable = this.radio
+            //console.log(this.addForm)
             this.editVisible = false;
-            this.$message.success(`修改第 ${this.idx + 1} 行成功`);
-            this.$set(this.tableData, this.idx, this.form);
-            console.log('保存', this.radio)
+            axios
+                .put(global.serverAddress + '/user',qs.stringify(this.addForm), {
+                    headers: {
+                        authorization: localStorage.getItem('token')
+                    }
+                })
+                .then(value => {
+                    if(value.data.result){
+                        this.addVisible = false
+                        this.$message.success(value.data.msg)
+
+                    }else{
+                        this.$message.error(value.data.msg)
+                    }
+                    this.radio = null
+                    this.addForm = {}
+                    location.reload()
+                });
         },
         // 分页导航
         handlePageChange(val) {
