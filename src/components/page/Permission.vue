@@ -10,7 +10,7 @@
         <el-button type="primary" @click="() => handleAdd()" style="margin-bottom: 10px">新增权限</el-button>
         <div class="container">
             <el-table
-                :data="tableData.slice((currentPage-1)*pagesize,currentPage*pagesize)"
+                :data="tableData"
                 border
                 class="table"
                 ref="multipleTable"
@@ -37,13 +37,13 @@
                 <el-pagination
                     @size-change="handleSizeChange"
                     @current-change="handleCurrentChange"
-                    :current-page="currentPage"
-                    :page-sizes="[5, 10, 20, 40]"
+                    :current-page.sync="currentPage"
+                    :page-sizes="[5, 10, 15, 20]"
                     :page-size="pagesize"
-                    layout="total, sizes,prev, pager, next"
-                    :total="tableData.length"
-                    prev-text="上一页"
-                    next-text="下一页"
+                    background
+                    layout="total, sizes, prev, pager, next, jumper"
+                    :total="total"
+                    style="text-align: center"
                 ></el-pagination>
             </div>
         </div>
@@ -106,12 +106,12 @@ import qs from 'qs';
 export default {
     data: function() {
         return {
-            query: {
-                address: '',
-                name: '',
-                pageIndex: 1,
-                pageSize: 10
-            },
+            // query: {
+            //     address: '',
+            //     name: '',
+            //     pageIndex: 1,
+            //     pageSize: 10
+            // },
             tableData: [],
             pageTotal: 10,
             editVisible: false,
@@ -119,32 +119,34 @@ export default {
             form: {},
             addForm: {},
             currentPage: 1, //默认显示页面为1
-            pagesize: 10 //    每页的数据条数
+            pagesize: 10, //    每页的数据条数
+            total: 0
         };
     },
 
     created() {
-        this.getMyData();
+        // this.getMyData();
+        this.handleDataGet();
     },
 
     methods: {
-        getMyData() {
+        PageAxios(pageNum, size) {
+
             axios
-                .get(global.serverAddress + '/permission', {
+                .get(global.serverAddress + '/permission',{
                     headers: {
                         authorization: localStorage.getItem('token')
+                    },
+                    params:{
+                        pageNum: pageNum,
+                        size: size
                     }
                 })
                 .then(value => {
-                    console.log(value.data);
-                    this.tableData = value.data;
+                    console.log(value.data.data);
+                    this.tableData = value.data.data.data;
+                    this.total = value.data.data.total;
                 });
-        },
-
-        // 分页导航
-        handlePageChange(val) {
-            this.$set(this.query, 'pageIndex', val);
-            this.getData();
         },
 
         // 编辑操作
@@ -158,14 +160,20 @@ export default {
             // console.log(data.desc_)
         },
 
-        //每页下拉显示数据
+        handleDataGet() {
+            this.PageAxios(0, this.pagesize);
+        },
+
+        // 控制页面页数
         handleSizeChange: function(size) {
             this.pagesize = size;
+            this.PageAxios(0, size);
+            this.currentPage = 1;
             /*console.log(this.pagesize) */
         },
         //点击第几页
         handleCurrentChange: function(currentPage) {
-            this.currentPage = currentPage;
+            this.PageAxios(currentPage-1, this.pagesize)
             /*console.log(this.currentPage) */
         }
     }
