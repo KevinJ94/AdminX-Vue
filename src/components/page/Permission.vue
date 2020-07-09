@@ -57,7 +57,12 @@
                             <el-input v-model="form.enable"></el-input>
                 </el-form-item>-->
                 <el-form-item label="方法">
-                    <el-input v-model="form.method"></el-input>
+                    <el-select v-model="form.method"  placeholder="请选择">
+                        <el-option label="GET" value="GET"></el-option>
+                        <el-option label="POST" value="POST"></el-option>
+                        <el-option label="PUT" value="PUT"></el-option>
+                        <el-option label="DELETE" value="DELETE"></el-option>
+                    </el-select>
                 </el-form-item>
                 <el-form-item label="名称">
                     <el-input v-model="form.name"></el-input>
@@ -68,32 +73,40 @@
             </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="editVisible = false">取 消</el-button>
-                <el-button type="primary">确 定</el-button>
+                <el-button type="primary" @click="saveEdit">确 定</el-button>
             </span>
         </el-dialog>
 
         <!-- 添加弹出框 -->
         <el-dialog title="添加" :visible.sync="addVisible" width="30%">
-            <el-form ref="form" :model="form" label-width="70px">
-                <el-form-item label="权限">
-                    <el-input v-model="form.desc"></el-input>
-                </el-form-item>
+            <el-form ref="form" :model="addForm" label-width="70px">
+               
                 <!-- <el-form-item label="状态">
                             <el-input v-model="form.enable"></el-input>
                 </el-form-item>-->
                 <el-form-item label="方法">
-                    <el-input v-model="form.method"></el-input>
+                    
+                    <el-select v-model="addForm.method"  placeholder="请选择">
+                        <el-option label="GET" value="GET"></el-option>
+                        <el-option label="POST" value="POST"></el-option>
+                        <el-option label="PUT" value="PUT"></el-option>
+                        <el-option label="DELETE" value="DELETE"></el-option>
+                    </el-select>
+                    
                 </el-form-item>
                 <el-form-item label="名称">
-                    <el-input v-model="form.name"></el-input>
+                    <el-input v-model="addForm.name"></el-input>
                 </el-form-item>
                 <el-form-item label="路由">
-                    <el-input v-model="form.url"></el-input>
+                    <el-input v-model="addForm.url"></el-input>
+                </el-form-item>
+                 <el-form-item label="描述">
+                    <el-input v-model="addForm.desc"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="editVisible = false">取 消</el-button>
-                <el-button type="primary">确 定</el-button>
+                <el-button type="primary" @click="saveAdd">确 定</el-button>
             </span>
         </el-dialog>
     </div>
@@ -154,10 +167,50 @@ export default {
             this.form = row;
             this.editVisible = true;
         },
+        saveEdit() {
+
+             axios
+                .put(global.serverAddress + '/permission',qs.stringify(this.form), {
+                    headers: {
+                        authorization: localStorage.getItem('token')
+                    }
+                })
+                .then(value => {
+                    if(value.data.result){
+                        this.addVisible = false
+                        this.$message.success(value.data.msg)
+
+                    }else{
+                        this.$message.error(value.data.msg)
+                    }
+                    this.form = {}
+                    location.reload()
+                });
+        },
 
         handleAdd() {
             this.addVisible = true;
-            // console.log(data.desc_)
+            
+        },
+        saveAdd() {
+            axios
+                .post(global.serverAddress + '/permission',qs.stringify(this.addForm), {
+                    headers: {
+                        authorization: localStorage.getItem('token')
+                    }
+                })
+                .then(value => {
+                    if(value.data.result){
+                        this.addVisible = false
+                        this.$message.success(value.data.msg)
+
+                    }else{
+                        this.$message.error(value.data.msg)
+                    }
+                    this.addForm = {}
+                    location.reload()
+                });
+            
         },
 
         handleDataGet() {

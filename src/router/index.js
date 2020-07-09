@@ -81,7 +81,7 @@ export let routerData = [
         // 权限页面
         path: '/permission',
         component: (resolve) => require(/* webpackChunkName: "permission" */ ['../components/page/Permission.vue'],resolve),
-        meta: { title: '权限测试', permission: true }
+        meta: { title: '权限管理', permission: true }
     },
     {
         path: '/404',
