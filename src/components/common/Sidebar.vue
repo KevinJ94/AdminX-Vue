@@ -182,7 +182,7 @@ export  default {
                     authorization:localStorage.getItem('token')
                 }
             }).then((value)=>{
-                console.log(value.data.result)
+                //console.log(value.data.result)
                 if(value.data.result){
                     this.items = value.data.data;
                 }else{

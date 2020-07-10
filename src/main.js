@@ -33,7 +33,7 @@ router.beforeEach((to, from, next) => {
         next('/');
     } 
     else {
-        console.log('here')
+        //console.log('here')
         // if(localStorage.getItem('routers')){
         //     console.log(JSON.parse(localStorage.getItem('routers')))
         //     router.addRoutes(JSON.parse(localStorage.getItem('routers')))
