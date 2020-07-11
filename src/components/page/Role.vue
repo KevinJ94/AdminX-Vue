@@ -14,9 +14,24 @@
                 <span class="custom-tree-node" slot-scope="{ node, data }">
                     <span>{{ node.label }}</span>
                     <span>
-                        <el-button type="text" size="large" icon="el-icon-lx-add" @click="() => handleAdd(data)">新增子角色</el-button>
-                        <el-button type="text" size="large" icon="el-icon-edit" @click="() => handleEdit(data)">编辑角色</el-button>
-                        <el-button type="text" size="large" icon="el-icon-s-promotion">分配权限</el-button>
+                        <el-button
+                            type="text"
+                            size="large"
+                            icon="el-icon-lx-add"
+                            @click="() => handleAdd(data)"
+                        >新增子角色</el-button>
+                        <el-button
+                            type="text"
+                            size="large"
+                            icon="el-icon-edit"
+                            @click="() => handleEdit(data)"
+                        >编辑角色</el-button>
+                        <el-button
+                            type="text"
+                            size="large"
+                            icon="el-icon-s-promotion"
+                            @click="() => handleEditRouter(data)"
+                        >分配权限</el-button>
                         <el-button type="text" size="large" icon="el-icon-menu">分配菜单</el-button>
                         <!-- <el-button type="text" size="large" @click="() => handleBan(data)">Delete</el-button> -->
                         <el-button type="text" size="large" icon="el-icon-delete" @click="open">删除角色</el-button>
@@ -35,7 +50,7 @@
                         <el-input v-model="addForm.pid" :disabled="true"></el-input>
                     </el-form-item>
                     <el-form-item label="名称:">
-                        <el-input v-model="addForm.name" ></el-input>
+                        <el-input v-model="addForm.name"></el-input>
                     </el-form-item>
                     <el-form-item label="描述:">
                         <el-input v-model="addForm.desc"></el-input>
@@ -51,7 +66,6 @@
             <!-- 修改弹出框 -->
             <el-dialog title="修改角色" :visible.sync="editVisible" width="30%">
                 <el-form ref="form" :model="form" label-width="70px">
-                    
                     <el-form-item label="名称:">
                         <el-input v-model="form.name" @input="change($event)"></el-input>
                     </el-form-item>
@@ -64,20 +78,47 @@
                     <el-button @click="editVisible = false">取 消</el-button>
                 </span>
             </el-dialog>
-
-            
-
         </div>
-        <!-- <div>
-        禁用弹出框-->
-        <!-- <el-dialog title="禁用角色" :visible.sync="banVisible" width="30%">
-                spo
+        <div>
+            <!-- 修改弹出框 -->
+            <el-dialog title="编辑路由" :visible.sync="editRouterVisible" width="70%">
+                <h3>已有路由</h3>
+                <h3>新增路由</h3>
+                <el-table
+                    :data="tableData"
+                    border
+                    class="table"
+                    ref="multipleTable"
+                    header-cell-class-name="table-header"
+                    @selection-change="handleSelectionChange"
+                >
+                    <el-table-column type="selection" width="55" align="center"></el-table-column>
+                    <el-table-column prop="id" label="ID" width="55" align="center"></el-table-column>
+                    <el-table-column prop="desc" label="权限"></el-table-column>
+                    <el-table-column prop="method" label="方法"></el-table-column>
+                    <el-table-column prop="name" label="名称" align="center"></el-table-column>
+                    <el-table-column prop="url" label="路由" align="center"></el-table-column>
+                </el-table>
+                <p style="padding-top: 10px">{{ "您已选择: "+ selected_data }}</p>
+                <div class="pagination">
+                    <el-pagination
+                        @size-change="handleSizeChange"
+                        @current-change="handleCurrentChange"
+                        :current-page.sync="currentPage"
+                        :page-sizes="[5, 10, 15, 20]"
+                        :page-size="pagesize"
+                        background
+                        layout="total, sizes, prev, pager, next, jumper"
+                        :total="total"
+                        style="text-align: center"
+                    ></el-pagination>
+                </div>
                 <span slot="footer" class="dialog-footer">
                     <el-button type="primary">确 定</el-button>
-                    <el-button @click="banVisible = false">取 消</el-button>
+                    <el-button @click="editRouterVisible = false">取 消</el-button>
                 </span>
             </el-dialog>
-        </div>-->
+        </div>
     </div>
 </template>
 
@@ -96,14 +137,21 @@ export default {
                 children: 'children',
                 label: 'desc_',
                 pid: 'pid',
-                id:'id',
-                title:'title'
+                id: 'id',
+                title: 'title'
             },
             editVisible: false,
             addVisible: false,
+            editRouterVisible: false,
             // banVisible: false,
             form: {},
-            addForm:{},
+            addForm: {},
+            tableData: [],
+            pageTotal: 10,
+            currentPage: 1, //默认显示页面为1
+            pagesize: 10, //    每页的数据条数
+            total: 0,
+            selected_data: []
         };
     },
 
@@ -116,8 +164,14 @@ export default {
             // console.log(data.title);
         },
 
-        change(e){
-            this.$forceUpdate()
+        change(e) {
+            this.$forceUpdate();
+        },
+
+        handleEditRouter(data) {
+            this.editRouterVisible = true;
+            this.handleDataGet();
+            // console.log(pid)
         },
 
         retriveData() {
@@ -137,35 +191,32 @@ export default {
             this.addVisible = true;
 
             if (data == null) {
-                this.addForm.desc_ = "无";
+                this.addForm.desc_ = '无';
                 //this.form.id = data.id;
                 //this.form.pid = data.pid;
             } else {
                 this.addForm.desc_ = data.desc_;
                 this.addForm.pid = data.id;
-                
             }
             // console.log(data.desc_)
         },
         saveAdd() {
-            
             //console.log(this.addForm)
-             axios
-                .post(global.serverAddress + '/role',qs.stringify(this.addForm), {
+            axios
+                .post(global.serverAddress + '/role', qs.stringify(this.addForm), {
                     headers: {
                         authorization: localStorage.getItem('token')
                     }
                 })
                 .then(value => {
-                    if(value.data.result){
-                        this.addVisible = false
-                        this.$message.success(value.data.msg)
-
-                    }else{
-                        this.$message.error(value.data.msg)
+                    if (value.data.result) {
+                        this.addVisible = false;
+                        this.$message.success(value.data.msg);
+                    } else {
+                        this.$message.error(value.data.msg);
                     }
-                    this.addForm = {}
-                    location.reload()
+                    this.addForm = {};
+                    location.reload();
                 });
         },
 
@@ -178,33 +229,24 @@ export default {
         },
 
         saveEdit() {
-            
             //console.log(this.form)
-             axios
-                .put(global.serverAddress + '/role',qs.stringify(this.form), {
+            axios
+                .put(global.serverAddress + '/role', qs.stringify(this.form), {
                     headers: {
                         authorization: localStorage.getItem('token')
                     }
                 })
                 .then(value => {
-                    if(value.data.result){
-                        this.editVisible = false
-                        this.$message.success(value.data.msg)
-
-                    }else{
-                        this.$message.error(value.data.msg)
+                    if (value.data.result) {
+                        this.editVisible = false;
+                        this.$message.success(value.data.msg);
+                    } else {
+                        this.$message.error(value.data.msg);
                     }
-                    this.form = {}
-                    location.reload()
+                    this.form = {};
+                    location.reload();
                 });
         },
-
-        // handleBan(data) {
-        //     this.banVisible = true;
-        //     let pid = data.id;
-        //     this.form.prole = data.desc_;
-        //     // console.log(pid)
-        // },
 
         open() {
             this.$confirm('此操作将使该角色失效, 是否继续?', '提示', {
@@ -224,6 +266,65 @@ export default {
                         message: '已取消删除'
                     });
                 });
+        },
+
+        handleEditRouter(data) {
+            this.editRouterVisible = true;
+            this.handleDataGet();
+            // console.log(pid)
+        },
+
+        PageAxios(pageNum, size) {
+            axios
+                .get(global.serverAddress + '/permission', {
+                    headers: {
+                        authorization: localStorage.getItem('token')
+                    },
+                    params: {
+                        pageNum: pageNum,
+                        size: size
+                    }
+                })
+                .then(value => {
+                    console.log(value.data.data);
+                    this.tableData = value.data.data.data;
+                    this.total = value.data.data.total;
+                });
+        },
+
+        handleDataGet() {
+            this.PageAxios(0, this.pagesize);
+        },
+
+        // 控制页面页数
+        handleSizeChange: function(size) {
+            this.pagesize = size;
+            this.PageAxios(0, size);
+            this.currentPage = 1;
+            /*console.log(this.pagesize) */
+        },
+        //点击第几页
+        handleCurrentChange: function(currentPage) {
+            this.PageAxios(currentPage - 1, this.pagesize);
+            /*console.log(this.currentPage) */
+        },
+
+        handleSelectionChange(val) {
+            var id_list = [];
+            var name_list = [];
+            val.forEach((val, index) => {
+                this.tableData.forEach((v, i) => {
+                    // id 是每一行的数据id
+                    if (val.id == v.id) {
+                        // console.log(i);
+                        id_list.push(v.id);
+                        name_list.push(v.desc);
+                    }
+                });
+            });
+            console.log(id_list);
+            console.log(name_list);
+            this.selected_data = name_list;
         }
     }
 };
