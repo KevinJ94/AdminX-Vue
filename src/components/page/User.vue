@@ -11,23 +11,6 @@
                 </div>
                 <div class="container">
                     <div class="handle-box" style="padding-bottom: 10px">
-                        <!-- <el-button
-                            style="padding-right: 10px"
-                            type="primary"
-                            icon="el-icon-delete"
-                            class="handle-del mr10"
-                            @click="delAllSelection"
-                        >批量删除</el-button>
-                        <el-select
-                            v-model="query.address"
-                            placeholder="地址"
-                            class="handle-select mr10"
-                        >
-                            <el-option key="1" label="广东省" value="广东省"></el-option>
-                            <el-option key="2" label="湖南省" value="湖南省"></el-option>
-                        </el-select> -->
-
-                        <!-- <el-input v-model="query.name" placeholder="用户名" class="handle-input mr10"></el-input> -->
                         <el-button type="primary" icon="el-icon-lx-add" @click="handleAdd">新增用户</el-button>
                     </div>
                     <el-table
@@ -41,19 +24,6 @@
                         <el-table-column type="selection" width="55" align="center"></el-table-column>
                         <el-table-column prop="id" label="ID" width="55" align="center"></el-table-column>
                         <el-table-column prop="name" label="用户名"></el-table-column>
-                        <!-- <el-table-column label="账户余额">
-                            <template slot-scope="scope">￥{{scope.row.money}}</template>
-                        </el-table-column>
-                        <el-table-column label="头像(查看大图)" align="center">
-                            <template slot-scope="scope">
-                                <el-image
-                                    class="table-td-thumb"
-                                    :src="scope.row.thumb"
-                                    :preview-src-list="[scope.row.thumb]"
-                                ></el-image>
-                            </template>
-                        </el-table-column>
-                        <el-table-column prop="address" label="地址"></el-table-column>-->
                         <el-table-column prop="enable" label="状态" align="center">
                             <template slot-scope="scope">
                                 <el-tag
@@ -70,12 +40,12 @@
                                     icon="el-icon-edit"
                                     @click="handleEdit(scope.$index, scope.row)"
                                 >编辑</el-button>
-                                <!-- <el-button
+                                <el-button
                                     type="text"
-                                    icon="el-icon-delete"
-                                    class="red"
-                                    @click="handleDelete(scope.$index, scope.row)"
-                                >删除</el-button> -->
+                                    icon="el-icon-s-promotion"
+                                    @click="handleRole(scope.$index, scope.row)"
+                                >分配角色</el-button>
+                               
                             </template>
                         </el-table-column>
                     </el-table>
@@ -137,6 +107,18 @@
                         <el-button type="primary" @click="saveAdd">确 定</el-button>
                     </span>
                 </el-dialog>
+
+
+                <el-dialog title="分配角色" :visible.sync="roleVisible" width="30%">
+                    <el-form ref="form" :model="form" label-width="70px">
+                       
+                    </el-form>
+                    <span slot="footer" class="dialog-footer">
+                        <el-button @click="roleVisible = false">取 消</el-button>
+                        <el-button type="primary" >确 定</el-button>
+                    </span>
+                </el-dialog>
+
             </div>
         </template>
     </div>
@@ -164,6 +146,7 @@ export default {
             delList: [],
             editVisible: false,
             addVisible: false,
+            roleVisible: false,
             pageTotal: 0,
             form: {},
             addForm:{},
@@ -201,6 +184,9 @@ export default {
         handleSearch() {
             this.$set(this.query, 'pageIndex', 1);
             this.getData();
+        },
+        handleRole(index, row) {
+            this.roleVisible = true;
         },
         // 删除操作
         handleDelete(index, row) {

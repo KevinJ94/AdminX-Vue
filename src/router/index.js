@@ -26,9 +26,9 @@ export let routerData = [
         meta: { title: '基础表格' }
     },
     {
-        path: '/tabs',
-        component: (resolve) => require(/* webpackChunkName: "tabs" */ ['../components/page/Tabs.vue'],resolve),
-        meta: { title: 'tab选项卡' }
+        path: '/menu',
+        component: (resolve) => require(/* webpackChunkName: "tabs" */ ['../components/page/Menu.vue'],resolve),
+        meta: { title: '菜单管理' }
     },
     {
         path: '/form',

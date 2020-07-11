@@ -14,11 +14,12 @@
                 <span class="custom-tree-node" slot-scope="{ node, data }">
                     <span>{{ node.label }}</span>
                     <span>
-                        <el-button type="text" size="large" @click="() => handleAdd(data)">新增子角色</el-button>
-                        <el-button type="text" size="large" @click="() => handleEdit(data)">编辑角色</el-button>
-                        <el-button type="text" size="large" >分配权限</el-button>
+                        <el-button type="text" size="large" icon="el-icon-lx-add" @click="() => handleAdd(data)">新增子角色</el-button>
+                        <el-button type="text" size="large" icon="el-icon-edit" @click="() => handleEdit(data)">编辑角色</el-button>
+                        <el-button type="text" size="large" icon="el-icon-s-promotion">分配权限</el-button>
+                        <el-button type="text" size="large" icon="el-icon-menu">分配菜单</el-button>
                         <!-- <el-button type="text" size="large" @click="() => handleBan(data)">Delete</el-button> -->
-                        <el-button type="text" size="large" @click="open">删除角色</el-button>
+                        <el-button type="text" size="large" icon="el-icon-delete" @click="open">删除角色</el-button>
                     </span>
                 </span>
             </el-tree>
