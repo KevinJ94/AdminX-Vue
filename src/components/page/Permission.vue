@@ -156,7 +156,7 @@ export default {
                     }
                 })
                 .then(value => {
-                    console.log(value.data.data);
+                    //console.log(value.data.data);
                     this.tableData = value.data.data.data;
                     this.total = value.data.data.total;
                 });

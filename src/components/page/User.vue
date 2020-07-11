@@ -52,11 +52,13 @@
                     <div class="pagination">
                         <el-pagination
                             background
-                            layout="total, prev, pager, next"
-                            :current-page="query.pageIndex"
-                            :page-size="query.pageSize"
-                            :total="pageTotal"
-                            @current-change="handlePageChange"
+                            layout="total, sizes, prev, pager, next, jumper"
+                            :current-page.sync="currentPage"
+                            :page-sizes="[10, 15, 20]"
+                            :page-size="pagesize"
+                            :total="total"
+                            @size-change="handleSizeChange"
+                            @current-change="handleCurrentChange"
                         ></el-pagination>
                     </div>
                 </div>
@@ -135,12 +137,6 @@ export default {
     name: 'basetable',
     data() {
         return {
-            query: {
-                address: '',
-                name: '',
-                pageIndex: 1,
-                pageSize: 10
-            },
             tableData: [],
             multipleSelection: [],
             delList: [],
@@ -152,39 +148,39 @@ export default {
             addForm:{},
             idx: -1,
             id: -1,
-            radio: null
+            radio: null,
+            pageTotal: 10,
+            currentPage: 1, //默认显示页面为1
+            pagesize: 10, //    每页的数据条数
+            total: 0
         };
     },
     created() {
         //this.getData();
-        this.getMyData();
+        this.getMyData(0, this.pagesize);
     },
     methods: {
-        // 获取 easy-mock 的模拟数据
-        getData() {
-            fetchData(this.query).then(res => {
-                console.log(res);
-                this.tableData = res.list;
-                this.pageTotal = res.pageTotal || 50;
-            });
-        },
-        getMyData() {
+
+        getMyData(pageNum, size) {
             axios
                 .get(global.serverAddress + '/user', {
                     headers: {
                         authorization: localStorage.getItem('token')
+                    },
+                    params:{
+                        pageNum: pageNum,
+                        size: size
                     }
                 })
                 .then(value => {
-                    console.log(value.data.data);
-                    this.tableData = value.data.data;
+                    //console.log(value.data.data);
+                    //this.tableData = value.data.data;
+                    this.tableData = value.data.data.data;
+                    this.total = value.data.data.total;
                 });
         },
         // 触发搜索按钮
-        handleSearch() {
-            this.$set(this.query, 'pageIndex', 1);
-            this.getData();
-        },
+        
         handleRole(index, row) {
             this.roleVisible = true;
         },
@@ -278,11 +274,19 @@ export default {
                     location.reload()
                 });
         },
-        // 分页导航
-        handlePageChange(val) {
-            this.$set(this.query, 'pageIndex', val);
-            this.getData();
+         // 控制页面页数
+        handleSizeChange: function(size) {
+            this.pagesize = size;
+            this.getMyData(0, size);
+            this.currentPage = 1;
+            /*console.log(this.pagesize) */
+        },
+        //点击第几页
+        handleCurrentChange: function(currentPage) {
+            this.getMyData(currentPage-1, this.pagesize)
+            /*console.log(this.currentPage) */
         }
+        
     }
 };
 </script>
