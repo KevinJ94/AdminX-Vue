@@ -224,6 +224,7 @@ export default {
             this.retriveData();
             this.getRoleid(row.id);
             this.roledata.uid = row.id
+            this.$forceUpdate();
         },
         // 删除操作
         handleDelete(index, row) {
