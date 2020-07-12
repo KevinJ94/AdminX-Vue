@@ -2,7 +2,7 @@
     <div class="custom-tree-container">
         <div class="block">
             <p style="padding-bottom: 10px">角色管理</p>
-            <el-button type="primary" @click="() => handleAdd()" style="margin-bottom: 10px">新增角色</el-button>
+            <!-- <el-button type="primary" @click="() => handleAdd()" style="margin-bottom: 10px">新增角色</el-button> -->
             <el-tree
                 :data="data"
                 :props="defaultProps"
@@ -32,7 +32,12 @@
                             icon="el-icon-s-promotion"
                             @click="() => handleEditRouter(data)"
                         >分配权限</el-button>
-                        <el-button type="text" size="large" icon="el-icon-menu">分配菜单</el-button>
+                        <el-button
+                            type="text"
+                            size="large"
+                            icon="el-icon-menu"
+                            @click="() => handleMenuDistrbute(data)"
+                        >分配菜单</el-button>
                         <!-- <el-button type="text" size="large" @click="() => handleBan(data)">Delete</el-button> -->
                         <el-button type="text" size="large" icon="el-icon-delete" @click="open">删除角色</el-button>
                     </span>
@@ -119,6 +124,29 @@
                 </span>
             </el-dialog>
         </div>
+        <div>
+            <el-dialog title="分配菜单" :visible.sync="menuVisible" width="30%">
+                <el-form ref="form" :model="form" label-width="70px">
+                    <el-tree
+                        :data="menudata"
+                        :props="menu_defaultProps"
+                        ref="tree"
+                        show-checkbox
+                        node-key="id"
+                        default-expand-all
+                        :expand-on-click-node="false"
+                    >
+                        <span class="custom-tree-node" slot-scope="{ node }">
+                            <span>{{ node.label }}</span>
+                        </span>
+                    </el-tree>
+                </el-form>
+                <span slot="footer" class="dialog-footer">
+                    <el-button @click="cancel">取 消</el-button>
+                    <el-button type="primary" @click="getselectedid">确 定</el-button>
+                </span>
+            </el-dialog>
+        </div>
     </div>
 </template>
 
@@ -140,9 +168,18 @@ export default {
                 id: 'id',
                 title: 'title'
             },
+            menudata: [],
+            menu_defaultProps: {
+                children: 'children',
+                label: 'title',
+                pid: 'pid',
+                id: 'id',
+                title: 'title'
+            },
             editVisible: false,
             addVisible: false,
             editRouterVisible: false,
+            menuVisible: false,
             // banVisible: false,
             form: {},
             addForm: {},
@@ -151,7 +188,8 @@ export default {
             currentPage: 1, //默认显示页面为1
             pagesize: 10, //    每页的数据条数
             total: 0,
-            selected_data: []
+            selected_data: [],
+            selected_role_data:[]
         };
     },
 
@@ -274,6 +312,11 @@ export default {
             // console.log(pid)
         },
 
+        handleMenuDistrbute(data) {
+            this.menuVisible = true;
+            this.retriveMenuData();
+        },
+
         PageAxios(pageNum, size) {
             axios
                 .get(global.serverAddress + '/permission', {
@@ -289,6 +332,19 @@ export default {
                     console.log(value.data.data);
                     this.tableData = value.data.data.data;
                     this.total = value.data.data.total;
+                });
+        },
+
+        retriveMenuData() {
+            axios
+                .get(global.serverAddress + '/menu', {
+                    headers: {
+                        authorization: localStorage.getItem('token')
+                    }
+                })
+                .then(value => {
+                    // console.log(value.data.data);
+                    this.menudata = JSON.parse(JSON.stringify(value.data.data));
                 });
         },
 
@@ -325,6 +381,28 @@ export default {
             console.log(id_list);
             console.log(name_list);
             this.selected_data = name_list;
+        },
+
+        // handleCheckChange(data, checked, indeterminate) {
+        //     // console.log(data)
+            
+            
+        //     // let arr = [];
+        //     // res.forEach(item => {
+        //     //     arr.push(item.id);
+        //     // });
+        //     console.log(res)
+        // },
+
+        getselectedid(){
+            let res = this.$refs.tree.getCheckedKeys();
+            this.selected_role_data = res
+            console.log(this.selected_role_data)
+        },
+
+        cancel(){
+            this.menuVisible = false
+            console.log("closed")
         }
     }
 };
