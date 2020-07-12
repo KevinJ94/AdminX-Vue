@@ -108,7 +108,8 @@
                     </span>
                 </el-dialog>
 
-                <el-dialog title="分配角色" :visible.sync="roleVisible" width="30%">
+                <el-dialog title="分配角色" :visible.sync="roleVisible"  width="30%"
+                :before-close="handleClose">
                     <el-form ref="form" :model="form" label-width="70px">
                         <el-tree
                             :data="data"
@@ -119,12 +120,11 @@
                             default-expand-all
                             :expand-on-click-node="false"
                             :default-checked-keys= default_role_id
-                            @close = "closeDialog"
-                            :before-close="closeDialog"
-                        >
-                            <span class="custom-tree-node" slot-scope="{ node, data }">
+                            >
+                        
+                            <!-- <span class="custom-tree-node" slot-scope="{ node, data }">
                                 <span>{{ node.label + "----id: " + node.key}}</span>
-                            </span>
+                            </span> -->
                         </el-tree>
                     </el-form>
                     <span slot="footer" class="dialog-footer">
@@ -206,7 +206,7 @@ export default {
                 });
         },
 
-        retriveData() {//获取角色数据
+        retriveData(row) {//获取角色数据
             axios
                 .get(global.serverAddress + '/role', {
                     headers: {
@@ -216,15 +216,18 @@ export default {
                 .then(value => {
                     //console.log(value.data.data);
                     this.data = JSON.parse(JSON.stringify(value.data.data));
+                    this.getRoleid(row.id);
                 });
         },
         // 触发搜索按钮
         handleRole(index, row) {
-            this.roleVisible = true;
-            this.retriveData();
-            this.getRoleid(row.id);
-            this.roledata.uid = row.id
             this.$forceUpdate();
+            this.roleVisible = true;
+            this.retriveData(row);
+            //this.getRoleid(row.id);
+            this.roledata.uid = row.id
+            
+            
         },
         // 删除操作
         handleDelete(index, row) {
@@ -313,14 +316,16 @@ export default {
         },
         //获取用户角色
         getRoleid(user_id){
-            console.log("fff")
+            //console.log("fff")
             axios.get(global.serverAddress + '/allocrole/'+ user_id, {
                     headers: {
                         authorization: localStorage.getItem('token')
                     }
                 }).then(value=>{
-                    console.log(value.data.data)
+                    //console.log(value.data.data)
                     this.default_role_id = value.data.data.rids
+                    //this.$set(this.default_role_id,value.data.data.rids)
+                    //this.$forceUpdate();
                 });
         },
 
@@ -337,15 +342,17 @@ export default {
             /*console.log(this.currentPage) */
         },
 
-        closeDialog(done){
-            console.log("closed")
+        handleClose(done){
+            this.default_role_id = null;
+            this.data = null;
+            done();
         },
 
         saveRoldchanged(){//修改用户角色
             let res = this.$refs.tree.getCheckedKeys();
             this.roledata.rids = res
-            console.log(this.roledata.rids)
-            console.log(this.roledata.user_id)
+            //console.log(this.roledata.rids)
+            //console.log(this.roledata.user_id)
             axios
                     .post(global.serverAddress + '/allocrole', qs.stringify(this.roledata), {
                         headers: {
@@ -353,7 +360,7 @@ export default {
                         }
                     })
                     .then(value => {
-                        console.log(value)
+                        //console.log(value)
                         if (value.data.result) {
                             this.roleVisible = false;
                             this.$message.success(value.data.msg);
@@ -362,6 +369,8 @@ export default {
                         }
                         this.roledata.rids = []
                         this.roledata.user_id = null
+                        this.default_role_id = null;
+                        this.data = null;
                         // this.addForm = {};
                         // location.reload();
                     });
