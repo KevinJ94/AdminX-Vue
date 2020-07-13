@@ -122,9 +122,9 @@
                             :default-checked-keys= default_role_id
                             >
                         
-                            <!-- <span class="custom-tree-node" slot-scope="{ node, data }">
+                            <span class="custom-tree-node" slot-scope="{ node, data }">
                                 <span>{{ node.label + "----id: " + node.key}}</span>
-                            </span> -->
+                            </span>
                         </el-tree>
                     </el-form>
                     <span slot="footer" class="dialog-footer">
